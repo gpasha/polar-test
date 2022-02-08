@@ -32,7 +32,33 @@ export namespace DeepCopy {
      *
      */
     export function deepCopy<T extends any>(source: T): T {
-        return JSON.parse(JSON.stringify(source));
+        let result
+
+        if (typeof source === 'object' && !Array.isArray(source)) {
+            result = Object.assign({}, source)
+            for (let key in result) {
+                if(result.hasOwnProperty(key)) {
+                    if (typeof result[key] === 'object' || Array.isArray(result[key])) {
+                        result[key] = deepCopy(result[key])
+                    }
+                } 
+            }
+        }
+
+        else if (typeof source === 'object' && Array.isArray(source)) {
+            result = source.map(el => {
+                if (typeof el === 'object' || Array.isArray(el)) {
+                    el = deepCopy(el)
+                }
+                return el
+            })
+        }
+
+        else {
+            result = source
+        }
+
+        return result as T
     }
 
 }
